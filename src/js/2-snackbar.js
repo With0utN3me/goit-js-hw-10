@@ -1,32 +1,67 @@
-const form = document.querySelector("form")
-let localStoragekey = "feedback-form-state";
-let formData = {};
-window.addEventListener("load", () => { 
-    if (localStorage.getItem(localStoragekey) !== null ){
-        let parsedData = JSON.parse(localStorage.getItem(localStoragekey));
-        form.elements.email.value = parsedData.email ?? "";
-        form.elements.message.value = parsedData.message ?? "";
-    };
-})
+// Описаний у документації
+import iziToast from "izitoast";
+// Додатковий імпорт стилів
+import "izitoast/dist/css/iziToast.min.css";
 
-form.addEventListener("input", () => {
-    formData = {
-        email: form.elements.email.value.trim(),
-        message: form.elements.message.value.trim(),
-    }
-    localStorage.setItem(localStoragekey, JSON.stringify(formData));
+const delayInput = document.querySelector(`input[name="delay"]`);
+const radioButtons = document.querySelectorAll(`input[type="radio"]`);
+const notifyButton = document.querySelector(`button[type="submit"]`);
+
+// Оголошення загальних функцій
+let delay;
+let shouldResolve;
+
+// Функція створення промісів
+const makePromise = () => {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+                if(shouldResolve) {
+                    resolve(`Fulfilled promise in ${delay}ms`
+                    )
+                } else {
+                    reject(`Rejected promise in ${delay}ms`
+                    )
+                }
+            }, delay);
 });
+};
 
-form.addEventListener("submit", (evt) => {
-    if(form.elements.email.value.trim() !== "" && form.elements.message.value.trim() !== ""){
-        let parsedData = JSON.parse(localStorage.getItem(localStoragekey));
-        evt.preventDefault();
-        console.log(parsedData);
-        localStorage.removeItem(localStoragekey);
-        form.reset();
+//Івент лісенер для кнопки
+notifyButton.addEventListener("click", () => {
+    //Валідація інпуту делей
+    if(delayInput.value.includes("+") || delayInput.value.includes("-")){
+        return iziToast.error({
+            message: "Should not include + or -",
+            position: `topRight`,
+        });
     }
     else{
-        evt.preventDefault();
-        alert("Please, fill all the inputs");
+        delay = delayInput.value;
     }
-});
+    //Алгоритми перевірки радіо-кнопки
+    for (const radioButton of radioButtons) {
+        if(radioButton.checked){
+            if(radioButton.value === "fulfilled"){
+                shouldResolve = true;
+            }
+            else{
+                shouldResolve = false;
+            }
+            break;
+        }
+    }
+    //Виклик функції з передачею значень
+    makePromise(delay, shouldResolve)
+    .then(value => {
+        iziToast.success({
+            message: value,
+            position: `topRight`,
+        });
+    })
+    .catch(error => {
+        iziToast.error({
+            message: error,
+            position: `topRight`,
+        });
+    })
+})

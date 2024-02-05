@@ -17,6 +17,7 @@ function addLeadingZero(value){
 }
 let timerInterval = null;
 startButton.disabled = true;
+startButton.classList.add("disabled");
 const options = {
     enableTime: true,
     time_24hr: true,
@@ -27,10 +28,12 @@ const options = {
         if(Date.now() < selectedDates[0].getTime()){
             console.log(selectedDates[0]);
             userSelectedDate = selectedDates[0].getTime();
+            startButton.classList.remove("disabled")
             startButton.disabled = false;
         }
         else{
             startButton.disabled = true;
+            startButton.classList.add("disabled");
             iziToast.error({
                 message: "Please choose a date in the future",
                 position: `topRight`,
@@ -61,6 +64,7 @@ function convertMs(ms) {
     let userSelectedDate;
     startButton.addEventListener("click", () => {
         startButton.disabled = true;
+        startButton.classList.add("disabled");
         dataTimeInput.disabled = true;
 
 
