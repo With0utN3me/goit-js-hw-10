@@ -5,7 +5,7 @@ import "izitoast/dist/css/iziToast.min.css";
 
 const delayInput = document.querySelector(`input[name="delay"]`);
 const radioButtons = document.querySelectorAll(`input[type="radio"]`);
-const notifyButton = document.querySelector(`button[type="submit"]`);
+const form = document.querySelector(".form");
 
 // Оголошення загальних функцій
 let delay;
@@ -26,8 +26,9 @@ const makePromise = () => {
 });
 };
 
-//Івент лісенер для кнопки
-notifyButton.addEventListener("click", () => {
+//Івент лісенер для форми
+form.addEventListener("submit", (event) => {
+    event.preventDefault()
     //Валідація інпуту делей
     if(delayInput.value.includes("+") || delayInput.value.includes("-")){
         return iziToast.error({
